@@ -1,0 +1,3 @@
+[submodule "generals.io-Replay-Utils"]
+	path = generals.io-Replay-Utils
+	url = https://github.com/vzhou842/generals.io-Replay-Utils.git
