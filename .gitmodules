@@ -1,3 +1,6 @@
 [submodule "generals.io-Replay-Utils"]
 	path = generals.io-Replay-Utils
 	url = https://github.com/vzhou842/generals.io-Replay-Utils.git
+[submodule "common"]
+	path = common
+	url = https://github.com/datavistics/common.git
