@@ -1,18 +1,18 @@
 from dataclasses import dataclass
-from functools import cmp_to_key
+from functools import cmp_to_key, partial
+from logging import getLogger
 from typing import List
 
 from hand_crafted.constants import *
 from hand_crafted.map import Map
+
+module_logger = getLogger(__name__)
 
 
 @dataclass
 class Socket:
     gio_username: str
     gio_stars: int
-
-    def __len__(self):
-        len(self.gio_username)
 
     def emit(self):
         pass
@@ -30,11 +30,13 @@ class Score:
 @dataclass
 class Game:
     sockets: List[Socket]
-    teams: List[int]
+    teams: List[int] = None
 
     def __post_init__(self):
 
         # if not sockets return
+        if self.teams is None:
+            self.teams = list(range(len(self.sockets)))
         self.turn = 0
         self.alive_players = len(self.sockets)
         self.left_sockets = []
@@ -106,13 +108,13 @@ class Game:
         elif self.teams:
             winning_team = None
             for i in range(len(self.generals)):
-                if self.deaths.index(self.sockets[i]) < 0:
+                if self.sockets[i] not in self.deaths:
                     # Player is alive!
                     if winning_team is None:
                         winning_team = self.teams[i]
                     elif self.teams[i] != winning_team:
                         return
-        return True
+            return True
 
     def recalculate_scores(self):
         # Recalculate scores (totals, tiles).
@@ -120,9 +122,9 @@ class Game:
             self.scores[i].i = i
             self.scores[i].total = 0
             self.scores[i].tiles = 0
-            self.scores[i].dead = (self.deaths.index(self.sockets[i]) >= 0)
+            self.scores[i].dead = self.sockets[i] in self.deaths
 
-        for i in range(len(self.map.size())):
+        for i in range(self.map.size()):
             tile = self.map.tile_at(i)
             if tile >= 0:
                 self.scores[tile].total += self.map.army_at(i)
@@ -139,7 +141,7 @@ class Game:
                 return b.tiles - a.tiles
             return b.total - a.total
 
-        self.scores.sort(key=cmp_to_key(scores_sort))
+        self.scores.sort(key=cmp_to_key(partial(scores_sort, self)))
 
     def index_of_socket_id(self, socket_id):
         index = -1
@@ -150,7 +152,7 @@ class Game:
         return index
 
     # Returns false if the attack was useless, i.e. had no effect or failed.
-    def handle_attack(self, index, start, end, is50, attack_index):
+    def handle_attack(self, index, start, end, is50):
         # Verify that the attack starts from an owned tile.
         if self.map.tile_at(start) != index:
             return False
@@ -165,17 +167,18 @@ class Game:
 
         # Check if self attack toppled a general.
         new_end_tile = self.map.tile_at(end)
-        general_index = self.generals.index(end)
-        if new_end_tile != end_tile and general_index >= 0:
+        general_index = end in self.generals
+        if new_end_tile != end_tile and general_index:
             # General captured! Give the capturer command of the captured's army.
             self.map.replace_all(end_tile, new_end_tile, 0.5)
 
             # Only count as a death if self player has not died before (i.e. rage quitting)
             dead_socket = self.sockets[end_tile]
-            if self.deaths.index(dead_socket) < 0:
+            if dead_socket not in self.deaths:
                 self.deaths.append(dead_socket)
                 self.alive_players -= 1
                 # todo figure this out
+                module_logger.info(f'Game Lost, killer is {new_end_tile}')
                 # dead_socket.emit('game_lost',
                 #     killer: new_end_tile,
                 # )
@@ -188,7 +191,7 @@ class Game:
     def alive_teammate(self, index):
         if self.teams:
             for i in range(len(self.sockets)):
-                if self.teams[i] == self.teams[index] and self.deaths.index(self.sockets[i]) < 0:
+                if self.teams[i] == self.teams[index] and self.sockets[i] not in self.deaths:
                     return i
 
     # If the player hasn't been captured yet, either gives their land to a teammate
@@ -209,22 +212,25 @@ class Game:
             self.map.replace_all(player_index, new_index)
             self.cities.append(dead_general_index)
 
+
 def create_from_replay(game_replay):
+    sockets = []
     for i, g in enumerate(game_replay['generals']):
-        sockets = Socket(gio_username=game_replay['usernames'][i], gio_stars=(game_replay[i] or 0))
+        sockets.append(Socket(gio_username=game_replay['usernames'][i], gio_stars=(game_replay['stars'][i] or 0)))
 
-    game = Game(sockets=sockets, teams=game_replay.teams)
+    game = Game(sockets=sockets, teams=game_replay['teams'])
 
-    game['cities'] = []
-    game['generals'] = []
+    # todo make sure this is correct
+    # game.cities = []
+    # game.generals = []
 
     # Init the game map from the replay.
-    game.map = Map(game_replay['map_width'], game_replay["map_height"], game_replay["teams"])
+    game.map = Map(game_replay['mapWidth'], game_replay["mapHeight"], game_replay["teams"])
     for i in range(len(game_replay['mountains'])):
         game.add_mountain(game_replay['mountains'][i])
 
     for i in range(len(game_replay['cities'])):
-        game.add_city(game_replay['cities'][i], game_replay.city_armies[i])
+        game.add_city(game_replay['cities'][i], game_replay['cityArmies'][i])
 
     for i in range(len(game_replay['generals'])):
         game.add_general(game_replay['generals'][i])
