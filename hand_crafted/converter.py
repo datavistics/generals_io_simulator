@@ -1,5 +1,6 @@
-from pprint import pprint
 import json
+from pprint import pprint
+
 from lzstring import LZString, _decompress
 
 from common.proj_paths import dirs
@@ -11,7 +12,7 @@ def decompressFromUint8Array(compressed):
         return ""
     if compressed == "":
         return None
-    buf = [None for _ in range(int(len(compressed)/2))]
+    buf = [None for _ in range(int(len(compressed) / 2))]
     for i in range(len(buf)):
         buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1]
 
@@ -25,14 +26,20 @@ def deserialize(serialized):
     return lz
 
 
-def deserialize_afk(afk):
+def deserialize_afk(afks):
+    ret_afks = []
     keys = ['index', 'turn']
-    return dict(zip(keys, afk))
+    for afk in afks:
+        ret_afks.append(dict(zip(keys, afk)))
+    return ret_afks
 
 
-def deserialize_move(move):
+def deserialize_move(moves):
+    ret_move = []
     keys = ['index', 'start', 'end', 'is50', 'turn']
-    return dict(zip(keys, move))
+    for move in moves:
+        ret_move.append(dict(zip(keys, move)))
+    return ret_move
 
 
 def convert_dense_to_sparse(obj):
@@ -50,8 +57,9 @@ def convert_dense_to_sparse(obj):
     replay['moves'] = deserialize_move(obj[10])
     replay['afks'] = deserialize_afk(obj[11])
     replay['teams'] = obj[12]
-    replay['map_title'] = obj[13] # only available when version >= 7
+    replay['map_title'] = obj[13]  # only available when version >= 7
     return replay
+
 
 if __name__ == '__main__':
     file = dirs['replays'] / 'BeKdahWa4.gior'
