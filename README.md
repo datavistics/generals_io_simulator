@@ -11,5 +11,7 @@ original in js. I dont speak js, so Im re-writing it in python as Im a parser to
 
 # Installation
 1. Get python 3.7
-1. clone repo
-1. To be determined :) 
+1. clone repo with: `git clone --recurse-submodules -j8 https://github.com/datavistics/generals_io_simulator.git`
+1. go to proj_dir `cd generals_io_simulator`
+1. if you forgot the full clone step run `git submodule update --init --recursive`
+1. install requirements `pip install -r requirements.txt`
