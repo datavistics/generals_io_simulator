@@ -61,11 +61,16 @@ def convert_dense_to_sparse(obj):
     return replay
 
 
-if __name__ == '__main__':
-    file = dirs['replays'] / 'BeKdahWa4.gior'
+def gior_to_replay(file):
     with open(file, 'rb') as f:
         ser = f.read()
 
     des = deserialize(ser)
     replay = convert_dense_to_sparse(json.loads(des))
+    return replay
+
+
+if __name__ == '__main__':
+    file = dirs['replays'] / 'BeKdahWa4.gior'
+    replay = gior_to_replay(file)
     pprint(replay)
