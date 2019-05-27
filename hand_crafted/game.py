@@ -14,9 +14,6 @@ class Socket:
     gio_username: str
     gio_stars: int
 
-    def emit(self):
-        pass
-
 
 @dataclass
 class Score:
@@ -34,7 +31,7 @@ class Game:
 
     def __post_init__(self):
 
-        # if not sockets return
+        # if no teams, make it a free for all
         if self.teams is None:
             self.teams = list(range(len(self.sockets)))
         self.turn = 0

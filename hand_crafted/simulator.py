@@ -3,13 +3,13 @@ import logging.config
 from logging import getLogger
 
 from common.proj_paths import dirs
+from hand_crafted.converter import gior_to_replay
 from hand_crafted.game import create_from_replay
 
 logging.config.fileConfig(dirs['common'] / 'logging.ini')
 module_logger = getLogger(__name__)
 
-with open(dirs['replays'] / 'BeKdahWa4.gioreplay', encoding='UTF-8') as json_file:
-    replay = json.load(json_file)
+replay = gior_to_replay(dirs['replays'] / 'BeKdahWa4.gior')
 
 game = create_from_replay(replay)
 current_move_index = 0
@@ -43,7 +43,6 @@ def next_turn(current_move_index, current_afk_index):
 
 
 # Simulate the game!
-
 while not game.is_over() and game.turn < 2000:
     module_logger.info(f'Game turn: {game.turn}')
     current_move_index, current_afk_index = next_turn(current_move_index, current_afk_index)
