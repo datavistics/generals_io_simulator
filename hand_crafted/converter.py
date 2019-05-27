@@ -7,15 +7,17 @@ from common.proj_paths import dirs
 
 
 def decompressFromUint8Array(compressed):
+    """
+    LZ string doesnt have this implemented... so I have to.
+    :param compressed:
+    :return:
+    """
     lz = LZString()
     if compressed is None:
         return ""
     if compressed == "":
         return None
-    buf = [None for _ in range(int(len(compressed) / 2))]
-    for i in range(len(buf)):
-        buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1]
-
+    buf = [msbs * 256 + lsbs for msbs, lsbs in zip(compressed[:-1:2], compressed[1::2])]
     r = _decompress(len(buf), 32768, lambda index: buf[index])
     return r
 
