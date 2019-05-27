@@ -1,2 +1,3 @@
 lzstring
 requests
+tqdm

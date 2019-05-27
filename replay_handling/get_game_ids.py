@@ -5,6 +5,8 @@ from time import sleep
 
 import requests
 
+from common.proj_paths import dirs
+
 
 def get_game_ids(username, count):
     """
@@ -34,5 +36,5 @@ def get_game_ids(username, count):
 if __name__ == '__main__':
     username = 'Spraget'
     ids = get_game_ids(username, 2000)
-    with open(username + '.pkl', 'wb') as f:
+    with open(dirs['replays.game_ids']/username + '.pkl', 'wb') as f:
         pickle.dump(ids, f)
