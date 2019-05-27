@@ -76,7 +76,7 @@ class Game:
 
             while len(self.input_buffer[i]):
                 attack = self.input_buffer[i].splice(0, 1)[0]
-                if self.handle_attack(i, attack[0], attack[1], attack[2], attack[3]) is not False:
+                if self.handle_attack(i, attack[0], attack[1], attack[2], attack[3]):
                     # self attack wasn't useless.
                     break
         self.turn += 1
@@ -145,8 +145,8 @@ class Game:
 
     def index_of_socket_id(self, socket_id):
         index = -1
-        for i in range(len(self.sockets)):
-            if self.sockets[i].id == socket_id:
+        for i, socket in enumerate(self.sockets):
+            if socket.id == socket_id:
                 index = i
                 break
         return index
@@ -177,7 +177,7 @@ class Game:
             if dead_socket not in self.deaths:
                 self.deaths.append(dead_socket)
                 self.alive_players -= 1
-                # todo figure this out
+                # This seems close enough
                 module_logger.info(f'Game Lost, killer is {new_end_tile}')
                 # dead_socket.emit('game_lost',
                 #     killer: new_end_tile,
@@ -190,8 +190,8 @@ class Game:
     # Returns the index of an alive teammate of the given player, if any.
     def alive_teammate(self, index):
         if self.teams:
-            for i in range(len(self.sockets)):
-                if self.teams[i] == self.teams[index] and self.sockets[i] not in self.deaths:
+            for i, socket, team in enumerate(zip(self.sockets, self.teams)):
+                if team == self.teams[index] and socket not in self.deaths:
                     return i
 
     # If the player hasn't been captured yet, either gives their land to a teammate
@@ -219,10 +219,6 @@ def create_from_replay(game_replay):
         sockets.append(Socket(gio_username=game_replay['usernames'][i], gio_stars=(game_replay['stars'][i] or 0)))
 
     game = Game(sockets=sockets, teams=game_replay['teams'])
-
-    # todo make sure this is correct
-    # game.cities = []
-    # game.generals = []
 
     # Init the game map from the replay.
     game.map = Map(game_replay['mapWidth'], game_replay["mapHeight"], game_replay["teams"])

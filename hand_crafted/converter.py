@@ -12,7 +12,6 @@ def decompressFromUint8Array(compressed):
     :param compressed:
     :return:
     """
-    lz = LZString()
     if compressed is None:
         return ""
     if compressed == "":
