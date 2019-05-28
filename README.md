@@ -16,6 +16,6 @@ original in js. I dont speak js, so Im re-writing it in python as Im a parser to
 1. if you forgot the full clone step run `git submodule update --init --recursive`
 1. install requirements `pip install -r requirements.txt`
 
-# Todo
-1. How to generate map?
-1. Debug input_buffer
+# Map Generation
+Its not clear how to do this effectively, so I am scraping games from teh
+first user I found with many 1v1 games - Spraget. 
