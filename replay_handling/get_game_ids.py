@@ -2,6 +2,7 @@ import pickle
 from datetime import datetime
 from pprint import pprint
 from time import sleep
+from tqdm import trange
 
 import requests
 
@@ -17,7 +18,7 @@ def get_game_ids(username, count):
     """
     page_size = 20
     ids = []
-    for offset in range(0, count, page_size):
+    for offset in trange(0, count, page_size):
         url = f"http://generals.io/api/replaysForUsername?u={username}&offset={offset}&count={page_size}"
         r = requests.get(url)
         response_json = r.json()
@@ -36,5 +37,5 @@ def get_game_ids(username, count):
 if __name__ == '__main__':
     username = 'Spraget'
     ids = get_game_ids(username, 2000)
-    with open(dirs['replays.game_ids']/username + '.pkl', 'wb') as f:
+    with open(dirs['replays.game_ids']/f'{username}_games.pkl', 'wb') as f:
         pickle.dump(ids, f)

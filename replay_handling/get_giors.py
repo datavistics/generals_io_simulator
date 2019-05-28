@@ -17,7 +17,7 @@ def download_giors(username, ids):
         r = requests.get(gior_url)
         with open(dir / f'{id}.gior', 'wb') as f:
             f.write(r.content)
-        time.sleep(.1)
+        time.sleep(1)
 
 
 if __name__ == '__main__':
