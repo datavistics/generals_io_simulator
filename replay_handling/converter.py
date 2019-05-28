@@ -1,7 +1,6 @@
 import json
-from pprint import pprint
 
-from lzstring import LZString, _decompress
+from lzstring import _decompress
 
 from common.proj_paths import dirs
 
@@ -71,7 +70,18 @@ def gior_to_replay(file):
     return replay
 
 
+def gior_to_giorreplay(file, file_out):
+    with open(file, 'rb') as f:
+        ser = f.read()
+
+    des = deserialize(ser)
+    replay = convert_dense_to_sparse(json.loads(des))
+    with open(file_out, 'w') as f:
+        f.write(json.dumps(replay))
+
+
 if __name__ == '__main__':
-    file = dirs['replays'] / 'BeKdahWa4.gior'
-    replay = gior_to_replay(file)
-    pprint(replay)
+    files = dirs['replays.giors.Spraget'].iterdir()
+    for file in files:
+        print(f'Handling {str(file)}')
+        gior_to_giorreplay(file, str(file.with_suffix('.gioreplay')).replace('giors', 'gioreplays'))

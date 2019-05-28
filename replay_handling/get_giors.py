@@ -10,10 +10,14 @@ from common.proj_paths import dirs
 def download_giors(username, ids):
     assert isinstance(ids, list), f"Make ids a list, not a string"
     dir = dirs['replays.giors'] / username
+    files = list(dir.iterdir())
+    file_stems = [f.stem for f in files]
     dir.mkdir(parents=True, exist_ok=True)  # Make dir if doesnt exist
     print(f"Adding {len(ids)} files to {str(dir)}")
     for id in tqdm(ids):
-        gior_url = f'https://generalsio-replays-bot.s3.amazonaws.com/{id}.gior'
+        if id in file_stems:
+            continue
+        gior_url = f'https://generalsio-replays-na.s3.amazonaws.com/{id}.gior'
         r = requests.get(gior_url)
         with open(dir / f'{id}.gior', 'wb') as f:
             f.write(r.content)
