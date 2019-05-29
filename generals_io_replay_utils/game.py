@@ -1,3 +1,4 @@
+import random
 from dataclasses import dataclass
 from functools import cmp_to_key, partial
 from logging import getLogger
@@ -5,6 +6,7 @@ from typing import List
 
 from generals_io_replay_utils.constants import *
 from generals_io_replay_utils.map import Map
+from replay_handling.converter import gior_to_map
 
 module_logger = getLogger(__name__)
 
@@ -235,3 +237,14 @@ def create_from_replay(game_replay):
         game.city_regen = True
 
     return game
+
+
+def create_for_ai(game_dir, users=['team_0', 'team_1']):
+    # get map
+    map_files = list(game_dir.glob('*.gioreplay'))
+    map_file = random.choice(map_files)
+    print(f'Using: {map_file.stem}')
+    map_dict = gior_to_map(map_file)
+    gmap = Map(map_dict['mapWidth'], map_dict['mapHeight'], teams=[0, 1], file=map_file.stem)
+
+

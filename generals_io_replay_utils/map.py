@@ -1,8 +1,11 @@
+import random
 from logging import getLogger
 from dataclasses import dataclass
 from math import floor, ceil
 from typing import List
 
+from common.proj_paths import dirs
+from replay_handling.converter import gior_to_map
 from generals_io_replay_utils.constants import *
 
 module_logger = getLogger(__name__)
@@ -13,6 +16,7 @@ class Map:
     width: int
     height: int
     teams: List[int] = None
+    file: str = ''
 
     def __post_init__(self):
         self._map = [TILE_EMPTY for _ in range(self.width * self.height)]
@@ -122,3 +126,17 @@ class Map:
         r2 = floor(index2 / self.width)
         c2 = index2 % self.width
         return abs(r1 - r2) + abs(c1 - c2)
+
+    @classmethod
+    def random_map(cls, game_dir, teams):
+        map_files = list(game_dir.glob('*.gioreplay'))
+        map_file = random.choice(map_files)
+        print(map_file)
+        map_dict = gior_to_map(map_file)
+        obj = cls(map_dict['mapWidth'], map_dict['mapHeight'], teams, file=map_file.stem)
+        return obj
+
+
+if __name__ == '__main__':
+    gdir = dirs['replays.gioreplays.Spraget']
+    Map.random_map(gdir, ['1', '2'])
