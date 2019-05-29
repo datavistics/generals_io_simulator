@@ -3,8 +3,8 @@ from functools import cmp_to_key, partial
 from logging import getLogger
 from typing import List
 
-from hand_crafted.constants import *
-from hand_crafted.map import Map
+from generals_io_replay_utils.constants import *
+from generals_io_replay_utils.map import Map
 
 module_logger = getLogger(__name__)
 

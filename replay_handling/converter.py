@@ -70,6 +70,16 @@ def gior_to_replay(file):
     return replay
 
 
+def gior_to_map(file):
+    with open(file, 'rb') as f:
+        ser = f.read()
+
+    des = deserialize(ser)
+    replay = convert_dense_to_sparse(json.loads(des))
+    map_keys = replay['mapWidth', 'mapHeight', 'stars', 'cities', 'cityArmies', 'generals', 'mountains']
+    return {k: v for k, v in replay.items() if k in map_keys}
+
+
 def gior_to_giorreplay(file, file_out):
     with open(file, 'rb') as f:
         ser = f.read()

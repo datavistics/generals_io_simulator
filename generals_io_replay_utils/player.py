@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from hand_crafted.map import Map
+from generals_io_replay_utils.map import Map
 
 
 @dataclass

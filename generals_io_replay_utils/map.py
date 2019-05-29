@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from math import floor, ceil
 from typing import List
 
-from hand_crafted.constants import *
+from generals_io_replay_utils.constants import *
 
 module_logger = getLogger(__name__)
 

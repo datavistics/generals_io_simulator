@@ -3,8 +3,8 @@ import logging.config
 from logging import getLogger
 
 from common.proj_paths import dirs
-from hand_crafted.converter import gior_to_replay
-from hand_crafted.game import create_from_replay
+from replay_handling.converter import gior_to_replay
+from generals_io_replay_utils.game import create_from_replay
 
 logging.config.fileConfig(dirs['common'] / 'logging.ini')
 module_logger = getLogger(__name__)
